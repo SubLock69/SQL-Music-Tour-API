@@ -7,11 +7,8 @@ const {Sequelize} = require('sequelize');
 require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-const sequelize = new Sequelize('tour','postgres','codeking420', {
-    host:'localhost',
-    port:5432,
-    dialect:'postgres',
-});
+//Uses options object from .env (comes back as string so must parse JSON)
+const sequelize = new Sequelize(JSON.parse(process.env.PG_URI));
 
 (async () => {
     try {
