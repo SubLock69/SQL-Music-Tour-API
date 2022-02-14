@@ -7,16 +7,6 @@ const {Sequelize} = require('sequelize');
 require('dotenv').config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//Uses options object from .env (comes back as string so must parse JSON)
-const sequelize = new Sequelize(JSON.parse(process.env.PG_URI));
-
-(async () => {
-    try {
-        await sequelize.authenticate();
-        console.log('Connected to DB');
-    } catch (err){console.log('Unable to connect!', err)}
-})();
-
 
 // ROOT
 app.get('/', (req, res) => {
