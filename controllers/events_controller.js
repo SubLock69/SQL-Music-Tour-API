@@ -1,7 +1,7 @@
 // DEPENDENCIES
 const events = require('express').Router();
 const db = require('../models');
-const { Event } = db;
+const { Event, Stage, MeetGreet, SetTime, Band, StageEvent } = db;
 
 //Routes
 //Retrieve all events
@@ -27,10 +27,44 @@ events.post('/', async (req, res) => {
 });
 
 // FIND A SPECIFIC BAND
-events.get('/:id', async (req, res) => {
+events.get('/:name', async (req, res) => {
   try {
       const foundEvent = await Event.findOne({
-          where: { event_id: req.params.id }
+          where: { name: req.params.name },
+          include: [
+              {
+                  model: MeetGreet,
+                  as: 'meet_greets',
+                  include: {
+                      model: Band,
+                      as: 'band',
+                      where: {band_id: {[Op.like]: `%${req.query.band_id ? req.query.band_id : ''}%`}}
+                  }
+              },{
+                  model: SetTime,
+                  as: 'set_times',
+                  include: [
+                    {
+                        model: Band,
+                        as: 'band',
+                        where: {band_id: {[Op.like]: `%${req.query.band_id ? req.query.band_id : ''}%`}}
+                    },
+                    {
+                        model: Stage,
+                        as: 'stage',
+                        where: {stage_id: {[Op.like]: `%${req.query.stage_id ? req.query.stage_id : ''}%`}}
+                    }
+                  ]
+              },{
+                  model: Stage,
+                  as: 'stages',
+                  include: {
+                    model: StageEvent,
+                    as: 'stage_events',
+                    where: {stage_id: {[Op.like]: `%${req.query.stage_id ? req.query.stage_id : ''}%`}}
+                  }
+              }
+          ]
       });
       res.status(200).json(foundEvent);
   } catch (error) {
